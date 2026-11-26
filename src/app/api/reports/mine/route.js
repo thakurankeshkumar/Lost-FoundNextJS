@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Report from "@/models/Report";
@@ -6,7 +5,7 @@ import { requireUser } from "@/lib/permissions";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request) {
   try {
     const auth = await requireUser();
 
@@ -20,18 +19,22 @@ export async function GET() {
     await connectDB();
 
     const userId = auth.user._id;
+    const { searchParams } = new URL(request.url);
+    const showAll = searchParams.get("all") === "true";
+
+    let reportsQuery = Report.find({ userId })
+      .select("-privateDetails -images.publicId")
+      .sort({ createdAt: -1 });
+
+    // Dashboard gets latest 5; My Reports can request all.
+    if (!showAll) {
+      reportsQuery = reportsQuery.limit(5);
+    }
 
     const [reports, total, lost, found] = await Promise.all([
-      Report.find({ userId })
-        .select("-privateDetails -images.publicId")
-        .sort({ createdAt: -1 })
-        .limit(5)
-        .lean(),
-
+      reportsQuery.lean(),
       Report.countDocuments({ userId }),
-
       Report.countDocuments({ userId, type: "lost" }),
-
       Report.countDocuments({ userId, type: "found" }),
     ]);
 
