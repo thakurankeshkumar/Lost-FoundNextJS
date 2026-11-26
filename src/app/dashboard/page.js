@@ -259,7 +259,7 @@ export default function DashboardPage() {
             </Link>
 
             <Link
-              href="/report/new"
+              href="/reports/new"
               className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-blue-200 hover:shadow-md"
             >
               <span className="text-2xl">＋</span>

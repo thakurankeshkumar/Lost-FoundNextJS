@@ -41,12 +41,33 @@ function StatusBadge({ status }) {
 
   return (
     <span
-      className={`rounded-full px-3 py-1 text-xs font-medium ${
-        styles[status] || "bg-gray-100 text-gray-700"
-      }`}
+      className={`rounded-full px-3 py-1 text-xs font-medium ${styles[status] || "bg-gray-100 text-gray-700"
+        }`}
     >
       {status?.replace("_", " ") || "Unknown"}
     </span>
+  );
+}
+
+function AdminLinkCard({ title, description, href }) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-gray-900">{title}</h3>
+        <span className="text-lg text-gray-400 transition group-hover:translate-x-1 group-hover:text-blue-600">
+          →
+        </span>
+      </div>
+
+      <p className="mt-2 text-sm text-gray-500">{description}</p>
+
+      <p className="mt-4 text-sm font-medium text-blue-600">
+        Manage {title}
+      </p>
+    </Link>
   );
 }
 
@@ -109,6 +130,7 @@ export default function AdminDashboard() {
       <div className="flex min-h-screen items-center justify-center bg-gray-50 p-5">
         <div className="rounded-xl border border-red-200 bg-white p-6 text-center">
           <p className="font-semibold text-red-600">{error}</p>
+
           <button
             onClick={() => window.location.reload()}
             className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm text-white"
@@ -122,17 +144,24 @@ export default function AdminDashboard() {
 
   if (!data) return null;
 
-  const stats = data.statistics;
+  const stats = data.statistics || {};
+  const recentReports = data.recentReports || [];
+  const recentClaims = data.recentClaims || [];
 
   return (
     <main className="min-h-screen bg-gray-50">
+      {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5">
           <div>
-            <p className="text-sm font-semibold text-blue-600">FindBack</p>
+            <p className="text-sm font-semibold text-blue-600">
+              FindBack
+            </p>
+
             <h1 className="text-2xl font-bold text-gray-900">
               Admin Dashboard
             </h1>
+
             <p className="mt-1 text-sm text-gray-500">
               Manage and monitor the platform
             </p>
@@ -148,10 +177,44 @@ export default function AdminDashboard() {
       </header>
 
       <div className="mx-auto max-w-7xl space-y-8 px-5 py-8">
-        {/* User statistics */}
+
+        {/* Admin Management Navigation */}
+        <section>
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-gray-900">
+              Platform Management
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Manage reports, users, and ownership claims.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AdminLinkCard
+              title="Reports"
+              description="Review reported items, remove inappropriate reports, and restore reports when required."
+              href="/admin/reports"
+            />
+
+            <AdminLinkCard
+              title="Users"
+              description="View registered users and manage account access by blocking or unblocking accounts."
+              href="/admin/users"
+            />
+
+            <AdminLinkCard
+              title="Claims"
+              description="View ownership claims and monitor their current status and handover progress."
+              href="/admin/claims"
+            />
+          </div>
+        </section>
+
+        {/* User Statistics */}
         <section>
           <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Users
+            User Statistics
           </h2>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -160,11 +223,13 @@ export default function AdminDashboard() {
               value={stats.totalUsers}
               description="All registered accounts"
             />
+
             <StatCard
               title="Active Users"
               value={stats.activeUsers}
               description="Accounts currently active"
             />
+
             <StatCard
               title="Blocked Users"
               value={stats.blockedUsers}
@@ -173,10 +238,10 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* Report statistics */}
+        {/* Report Statistics */}
         <section>
           <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Reports
+            Report Statistics
           </h2>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -185,16 +250,19 @@ export default function AdminDashboard() {
               value={stats.totalReports}
               description="All submitted reports"
             />
+
             <StatCard
               title="Active Reports"
               value={stats.activeReports}
               description="Currently available reports"
             />
+
             <StatCard
               title="Lost Reports"
               value={stats.lostReports}
               description="Items reported as lost"
             />
+
             <StatCard
               title="Found Reports"
               value={stats.foundReports}
@@ -202,7 +270,7 @@ export default function AdminDashboard() {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Reports Under Review"
               value={stats.underReviewReports}
@@ -211,10 +279,10 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* Claim statistics */}
+        {/* Claim Statistics */}
         <section>
           <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Ownership Claims
+            Ownership Claim Statistics
           </h2>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -223,11 +291,13 @@ export default function AdminDashboard() {
               value={stats.pendingClaims}
               description="Awaiting finder decision"
             />
+
             <StatCard
               title="Accepted Claims"
               value={stats.acceptedClaims}
               description="Accepted, awaiting completion"
             />
+
             <StatCard
               title="Completed Claims"
               value={stats.completedClaims}
@@ -236,17 +306,34 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* Recent reports */}
+        {/* Recent Reports */}
         <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Recent Reports
-          </h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">
+                Recent Reports
+              </h2>
 
-          {data.recentReports.length === 0 ? (
-            <p className="text-sm text-gray-500">No reports found.</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Latest reports submitted on FindBack
+              </p>
+            </div>
+
+            <Link
+              href="/admin/reports"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              View All Reports →
+            </Link>
+          </div>
+
+          {recentReports.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              No reports found.
+            </p>
           ) : (
             <div className="space-y-4">
-              {data.recentReports.map((report) => (
+              {recentReports.map((report) => (
                 <div
                   key={report._id}
                   className="flex flex-col justify-between gap-3 border-b border-gray-100 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
@@ -255,10 +342,12 @@ export default function AdminDashboard() {
                     <p className="font-semibold text-gray-900">
                       {report.title}
                     </p>
+
                     <p className="mt-1 text-sm text-gray-500">
                       {report.type} · {report.category} · {report.city},{" "}
                       {report.state}
                     </p>
+
                     <p className="mt-1 text-xs text-gray-400">
                       By {report.userId?.name || "Unknown user"} ·{" "}
                       {formatDate(report.createdAt)}
@@ -267,6 +356,7 @@ export default function AdminDashboard() {
 
                   <div className="flex items-center gap-3">
                     <StatusBadge status={report.status} />
+
                     <Link
                       href={`/reports/${report._id}`}
                       className="text-sm font-medium text-blue-600 hover:underline"
@@ -280,17 +370,34 @@ export default function AdminDashboard() {
           )}
         </section>
 
-        {/* Recent claims */}
+        {/* Recent Claims */}
         <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Recent Claims
-          </h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">
+                Recent Claims
+              </h2>
 
-          {data.recentClaims.length === 0 ? (
-            <p className="text-sm text-gray-500">No claims found.</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Latest ownership claim activity
+              </p>
+            </div>
+
+            <Link
+              href="/admin/claims"
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              View All Claims →
+            </Link>
+          </div>
+
+          {recentClaims.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              No claims found.
+            </p>
           ) : (
             <div className="space-y-4">
-              {data.recentClaims.map((claim) => (
+              {recentClaims.map((claim) => (
                 <div
                   key={claim._id}
                   className="flex flex-col justify-between gap-3 border-b border-gray-100 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
@@ -299,12 +406,15 @@ export default function AdminDashboard() {
                     <p className="font-semibold text-gray-900">
                       {claim.reportId?.title || "Report unavailable"}
                     </p>
+
                     <p className="mt-1 text-sm text-gray-500">
                       Claimant: {claim.claimantId?.name || "Unknown"}
                     </p>
+
                     <p className="text-sm text-gray-500">
                       Finder: {claim.finderId?.name || "Unknown"}
                     </p>
+
                     <p className="mt-1 text-xs text-gray-400">
                       {formatDate(claim.createdAt)}
                     </p>
@@ -317,6 +427,7 @@ export default function AdminDashboard() {
           )}
         </section>
 
+        {/* Footer */}
         <p className="text-center text-xs text-gray-400">
           FindBack Admin Panel
         </p>
