@@ -78,6 +78,11 @@ const reportSchema = new mongoose.Schema(
       default: "active",
       index: true,
     },
+    acceptedClaimId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Claim",
+      default: null,
+    },
   },
   { timestamps: true }
 );
