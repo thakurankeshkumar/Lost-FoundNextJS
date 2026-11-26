@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+import PageHeading from "@/components/PageHeading";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -39,48 +41,27 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="text-sm font-medium text-slate-500">
-          Loading your profile...
-        </p>
+      <main className="min-h-screen bg-slate-50">
+        <SiteNavbar />
+        <div className="flex min-h-[70vh] items-center justify-center px-5">
+          <p className="text-sm font-medium text-slate-500" aria-live="polite">
+            Loading your profile...
+          </p>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl text-white">
-              ⌖
-            </span>
-            <span className="text-lg font-bold text-slate-900">
-              FindBack
-            </span>
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
-          >
-            ← Dashboard
-          </Link>
-        </div>
-      </header>
+      <SiteNavbar />
 
       <div className="mx-auto max-w-4xl px-5 py-8 sm:py-10">
-        <div>
-          <p className="text-sm font-medium text-blue-600">
-            ACCOUNT SETTINGS
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-            My Profile
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            View your account information.
-          </p>
-        </div>
+        <PageHeading
+          eyebrow="Account"
+          title="Your profile"
+          description="Your FindBack account details and account type."
+        />
 
         {error && (
           <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -90,7 +71,7 @@ export default function ProfilePage() {
 
         {user && (
           <>
-            <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[0.02]">
               <div className="border-b border-slate-100 p-6 sm:p-8">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-2xl font-bold uppercase text-blue-700">
@@ -108,54 +89,77 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="space-y-6 p-6 sm:p-8">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <dl className="grid gap-6 p-6 sm:grid-cols-2 sm:p-8">
+                <div className="min-w-0">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Full name
-                  </p>
-                  <p className="mt-2 font-medium text-slate-800">
+                  </dt>
+                  <dd className="mt-2 font-medium text-slate-800">
                     {user.name}
-                  </p>
+                  </dd>
                 </div>
 
-                <div className="border-t border-slate-100 pt-6">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <div className="min-w-0">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Email address
-                  </p>
-                  <p className="mt-2 break-all font-medium text-slate-800">
+                  </dt>
+                  <dd className="mt-2 break-all font-medium text-slate-800">
                     {user.email}
-                  </p>
+                  </dd>
                 </div>
 
-                <div className="border-t border-slate-100 pt-6">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Account role
-                  </p>
-                  <span className="mt-2 inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold capitalize text-blue-700">
+                  </dt>
+                  <dd className="mt-2 inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold capitalize text-blue-700">
                     {user.role || "user"}
-                  </span>
+                  </dd>
                 </div>
 
-                <div className="border-t border-slate-100 pt-6">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <div className="min-w-0">
+                  <dt className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Account ID
-                  </p>
-                  <p className="mt-2 break-all font-mono text-sm text-slate-600">
-                    {user.id}
-                  </p>
+                  </dt>
+                  <dd className="mt-2 break-all font-mono text-sm text-slate-600">
+                    {user.id || "Not available"}
+                  </dd>
                 </div>
-              </div>
+              </dl>
             </section>
 
-            <div className="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-5">
-              <h3 className="font-semibold text-blue-900">
-                Profile information
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-blue-800">
-                Your account information is currently displayed in read-only
-                mode. Profile editing can be added later with a secure
-                profile-update API.
+            <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="font-semibold text-slate-900">
+                Go to your workspace
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Continue managing your FindBack activity.
               </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {user.role === "admin" ? (
+                  <Link
+                    href="/admin"
+                    className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  >
+                    Open admin workspace
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/my-reports"
+                      className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                    >
+                      Manage my reports
+                    </Link>
+                    <Link
+                      href="/reports"
+                      className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Browse reports
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </>
         )}

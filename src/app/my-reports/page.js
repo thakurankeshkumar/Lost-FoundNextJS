@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+import PageHeading from "@/components/PageHeading";
 
 export default function MyReportsPage() {
   const router = useRouter();
@@ -93,57 +95,27 @@ export default function MyReportsPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="text-sm font-medium text-slate-500">
-          Loading your reports...
-        </p>
+      <main className="min-h-screen bg-slate-50">
+        <SiteNavbar />
+        <div className="flex min-h-[70vh] items-center justify-center px-5">
+          <p className="text-sm font-medium text-slate-500" aria-live="polite">
+            Loading your reports...
+          </p>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl text-white">
-              ⌖
-            </span>
-            <span className="text-lg font-bold text-slate-900">
-              FindBack
-            </span>
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
-          >
-            ← Dashboard
-          </Link>
-        </div>
-      </header>
+      <SiteNavbar />
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-medium text-blue-600">
-              YOUR ACTIVITY
-            </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-              My Reports
-            </h1>
-            <p className="mt-2 text-sm text-slate-500">
-              View and manage all the lost and found reports you have submitted.
-            </p>
-          </div>
-
-          <Link
-            href="/report/new"
-            className="inline-flex w-fit items-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
-          >
-            + Create report
-          </Link>
-        </div>
+        <PageHeading
+          eyebrow="Your activity"
+          title="My reports"
+          description="View and manage all the lost and found reports you have submitted."
+        />
 
         {error && (
           <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -199,7 +171,7 @@ export default function MyReportsPage() {
 
                 {reports.length === 0 && (
                   <Link
-                    href="/report/new"
+                    href="/reports/new"
                     className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700"
                   >
                     Create your first report
@@ -240,15 +212,15 @@ export default function MyReportsPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/reports/${report._id}`}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                      >
+                        View
+                      </Link>
+
                       {report.status === "active" && (
                         <>
-                          <Link
-                            href={`/reports/${report._id}`}
-                            className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-                          >
-                            View
-                          </Link>
-
                           <Link
                             href={`/reports/${report._id}/edit`}
                             className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
@@ -268,11 +240,6 @@ export default function MyReportsPage() {
                         </>
                       )}
 
-                      {report.status !== "active" && (
-                        <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium capitalize text-slate-500">
-                          {report.status}
-                        </span>
-                      )}
                     </div>
                   </div>
                 ))}

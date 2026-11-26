@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
 
 export default function ReportDetailsPage() {
     const { id } = useParams();
@@ -476,10 +477,13 @@ export default function ReportDetailsPage() {
     // Loading screen.
     if (loading) {
         return (
-            <main className="flex min-h-screen items-center justify-center bg-slate-50">
-                <p className="text-slate-500">
-                    Loading report details...
-                </p>
+            <main className="min-h-screen bg-slate-50">
+                <SiteNavbar />
+                <div className="flex min-h-[70vh] items-center justify-center px-5">
+                    <p className="text-slate-500" aria-live="polite">
+                        Loading report details...
+                    </p>
+                </div>
             </main>
         );
     }
@@ -487,22 +491,25 @@ export default function ReportDetailsPage() {
     // Error screen.
     if (error || !report) {
         return (
-            <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-5 text-center">
-                <h1 className="text-2xl font-bold text-slate-900">
-                    Report not found
-                </h1>
+            <main className="min-h-screen bg-slate-50">
+                <SiteNavbar />
+                <div className="flex min-h-[70vh] flex-col items-center justify-center px-5 text-center">
+                    <h1 className="text-2xl font-bold text-slate-900">
+                        Report not found
+                    </h1>
 
-                <p className="mt-2 text-slate-500">
-                    {error ||
-                        "This report may have been removed or resolved."}
-                </p>
+                    <p className="mt-2 text-slate-500">
+                        {error ||
+                            "This report may have been removed or resolved."}
+                    </p>
 
-                <Link
-                    href="/reports"
-                    className="mt-6 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white"
-                >
-                    Back to Reports
-                </Link>
+                    <Link
+                        href="/reports"
+                        className="mt-6 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white"
+                    >
+                        Browse reports
+                    </Link>
+                </div>
             </main>
         );
     }
@@ -511,33 +518,7 @@ export default function ReportDetailsPage() {
 
     return (
         <main className="min-h-screen bg-slate-50">
-            {/* Navigation */}
-            <nav className="border-b border-slate-200 bg-white">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-                    <Link
-                        href="/"
-                        className="text-2xl font-bold text-slate-900"
-                    >
-                        FindBack
-                    </Link>
-
-                    <div className="flex items-center gap-5 text-sm font-medium">
-                        <Link
-                            href="/reports"
-                            className="text-slate-600 hover:text-blue-600"
-                        >
-                            Browse Reports
-                        </Link>
-
-                        <Link
-                            href="/dashboard"
-                            className="text-slate-600 hover:text-blue-600"
-                        >
-                            Dashboard
-                        </Link>
-                    </div>
-                </div>
-            </nav>
+            <SiteNavbar />
 
             <section className="mx-auto max-w-6xl px-5 py-10">
                 <Link

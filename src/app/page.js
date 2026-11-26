@@ -1,3 +1,7 @@
+import SessionRedirect from "./session-redirect";
+import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+
 const categories = [
   { icon: "📱", name: "Electronics", count: "Phones, laptops & more" },
   { icon: "🎒", name: "Bags & Accessories", count: "Bags, wallets, watches" },
@@ -29,49 +33,8 @@ const steps = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <a href="/" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl text-white">
-              ⌖
-            </div>
-            <div>
-              <p className="text-lg font-bold tracking-tight">FindBack</p>
-              <p className="text-[10px] font-medium tracking-widest text-slate-500">
-                LOST & FOUND PLATFORM
-              </p>
-            </div>
-          </a>
-
-          <div className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
-            <a href="#how-it-works" className="transition hover:text-blue-600">
-              How it works
-            </a>
-            <a href="#categories" className="transition hover:text-blue-600">
-              Categories
-            </a>
-            <a href="#about" className="transition hover:text-blue-600">
-              About
-            </a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="/login"
-              className="hidden rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:inline-flex"
-            >
-              Log in
-            </a>
-            <a
-              href="/register"
-              className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-            >
-              Get started <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </nav>
-      </header>
+      <SessionRedirect />
+      <SiteNavbar landing />
 
       {/* Hero */}
       <section className="relative overflow-hidden">
@@ -98,12 +61,12 @@ export default function Home() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
+              <Link
                 href="/register"
                 className="inline-flex items-center justify-center gap-3 rounded-xl bg-blue-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
               >
                 Report an item <span className="text-lg">→</span>
-              </a>
+              </Link>
               <a
                 href="#categories"
                 className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-4 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
@@ -224,7 +187,7 @@ export default function Home() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {categories.map((category) => (
-              <a
+              <Link
                 key={category.name}
                 href="/reports"
                 className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-slate-200/60"
@@ -241,7 +204,7 @@ export default function Home() {
                 <p className="mt-5 text-sm font-semibold text-blue-600">
                   Explore <span aria-hidden="true">→</span>
                 </p>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -287,12 +250,12 @@ export default function Home() {
           <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-400">
             Take a moment to report a found item. It could make someone&apos;s day.
           </p>
-          <a
+          <Link
             href="/register"
             className="mt-8 inline-flex items-center gap-3 rounded-xl bg-blue-600 px-6 py-4 text-sm font-semibold text-white transition hover:bg-blue-500"
           >
             Get started <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       </section>
 

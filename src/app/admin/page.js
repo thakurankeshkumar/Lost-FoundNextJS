@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+import PageHeading from "@/components/PageHeading";
 
 function formatDate(date) {
   if (!date) return "N/A";
@@ -15,14 +17,23 @@ function formatDate(date) {
   });
 }
 
-function StatCard({ title, value, description }) {
+function StatCard({ title, value, description, tone = "blue" }) {
+  const tones = {
+    blue: "border-l-blue-600",
+    green: "border-l-green-600",
+    amber: "border-l-amber-500",
+    slate: "border-l-slate-400",
+  };
+  const displayValue =
+    typeof value === "number" ? value.toLocaleString("en-IN") : value ?? 0;
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-gray-500">{title}</p>
-      <p className="mt-2 text-3xl font-bold text-gray-900">
-        {value ?? 0}
+    <div className={`rounded-2xl border border-slate-200 border-l-4 bg-white p-5 shadow-sm shadow-slate-900/[0.02] ${tones[tone]}`}>
+      <p className="text-sm font-medium text-slate-600">{title}</p>
+      <p className="mt-4 text-3xl font-bold tracking-tight text-slate-950">
+        {displayValue}
       </p>
-      <p className="mt-1 text-xs text-gray-500">{description}</p>
+      <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>
     </div>
   );
 }
@@ -53,19 +64,21 @@ function AdminLinkCard({ title, description, href }) {
   return (
     <Link
       href={href}
-      className="group rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+      className="group flex min-h-44 flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/[0.02] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
     >
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        <span className="text-lg text-gray-400 transition group-hover:translate-x-1 group-hover:text-blue-600">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition group-hover:bg-blue-50 group-hover:text-blue-700">
           →
         </span>
       </div>
 
-      <p className="mt-2 text-sm text-gray-500">{description}</p>
+      <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">
+        {description}
+      </p>
 
-      <p className="mt-4 text-sm font-medium text-blue-600">
-        Manage {title}
+      <p className="mt-5 text-sm font-semibold text-blue-700">
+        Open {title.toLowerCase()} <span aria-hidden="true">→</span>
       </p>
     </Link>
   );
@@ -75,6 +88,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   const [data, setData] = useState(null);
+  const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -99,6 +113,8 @@ export default function AdminDashboard() {
           return;
         }
 
+        setAdmin(authData.user);
+
         const response = await fetch("/api/admin/overview");
         const result = await response.json();
 
@@ -119,26 +135,33 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <p className="text-gray-600">Loading admin dashboard...</p>
-      </div>
+      <main className="min-h-screen bg-gray-50">
+        <SiteNavbar />
+        <div className="flex min-h-[70vh] items-center justify-center px-5">
+          <p className="text-gray-600" aria-live="polite">
+            Loading admin dashboard...
+          </p>
+        </div>
+      </main>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-5">
-        <div className="rounded-xl border border-red-200 bg-white p-6 text-center">
-          <p className="font-semibold text-red-600">{error}</p>
-
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm text-white"
-          >
-            Try Again
-          </button>
+      <main className="min-h-screen bg-gray-50">
+        <SiteNavbar />
+        <div className="flex min-h-[70vh] items-center justify-center p-5">
+          <div className="max-w-md rounded-xl border border-red-200 bg-white p-6 text-center">
+            <p className="font-semibold text-red-600">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm text-white"
+            >
+              Try again
+            </button>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -147,290 +170,255 @@ export default function AdminDashboard() {
   const stats = data.statistics || {};
   const recentReports = data.recentReports || [];
   const recentClaims = data.recentClaims || [];
+  const attentionItems = [
+    {
+      label: "Reports to review",
+      count: stats.underReviewReports || 0,
+      href: "/admin/reports",
+      description: "Check reports flagged for moderation.",
+      tone: "amber",
+    },
+    {
+      label: "Pending claims",
+      count: stats.pendingClaims || 0,
+      href: "/admin/claims",
+      description: "Follow up on ownership requests.",
+      tone: "blue",
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5">
-          <div>
-            <p className="text-sm font-semibold text-blue-600">
-              FindBack
-            </p>
+      <SiteNavbar />
 
-            <h1 className="text-2xl font-bold text-gray-900">
-              Admin Dashboard
-            </h1>
+      <div className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
+        <PageHeading
+          eyebrow="Admin workspace"
+          title={`Welcome back, ${admin?.name?.split(" ")[0] || "Admin"}`}
+          description="A clear view of reports, members, and ownership claims that need attention."
+        />
 
-            <p className="mt-1 text-sm text-gray-500">
-              Manage and monitor the platform
+        <section aria-label="Platform overview">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              title="Total reports"
+              value={stats.totalReports}
+              description="All reports submitted"
+              tone="slate"
+            />
+            <StatCard
+              title="Active reports"
+              value={stats.activeReports}
+              description="Visible to the community"
+              tone="green"
+            />
+            <StatCard
+              title="Registered users"
+              value={stats.totalUsers}
+              description={`${stats.activeUsers ?? 0} active accounts`}
+              tone="blue"
+            />
+            <StatCard
+              title="Pending claims"
+              value={stats.pendingClaims}
+              description="Waiting for a decision"
+              tone="amber"
+            />
+          </div>
+        </section>
+
+        <section className="mt-9">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-slate-900">
+              Needs your attention
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Work through these queues to keep the community moving.
             </p>
           </div>
 
-          <Link
-            href="/dashboard"
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            User Dashboard
-          </Link>
-        </div>
-      </header>
+          <div className="grid gap-4 md:grid-cols-2">
+            {attentionItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-sm"
+              >
+                <div>
+                  <p className="font-semibold text-slate-900">{item.label}</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {item.description}
+                  </p>
+                  <span className="mt-3 inline-flex text-sm font-semibold text-blue-700">
+                    Open queue <span className="ml-1" aria-hidden="true">→</span>
+                  </span>
+                </div>
+                <span
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold ${
+                    item.tone === "amber"
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-blue-50 text-blue-700"
+                  }`}
+                >
+                  {item.count}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
-      <div className="mx-auto max-w-7xl space-y-8 px-5 py-8">
-
-        {/* Admin Management Navigation */}
-        <section>
+        <section className="mt-9">
           <div className="mb-4">
-            <h2 className="text-lg font-bold text-gray-900">
-              Platform Management
+            <h2 className="text-lg font-bold text-slate-900">
+              Platform management
             </h2>
-
-            <p className="mt-1 text-sm text-gray-500">
-              Manage reports, users, and ownership claims.
+            <p className="mt-1 text-sm text-slate-500">
+              Go directly to the area you need to manage.
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AdminLinkCard
               title="Reports"
-              description="Review reported items, remove inappropriate reports, and restore reports when required."
+              description="Review submissions, moderate reports, and restore items when needed."
               href="/admin/reports"
             />
 
             <AdminLinkCard
               title="Users"
-              description="View registered users and manage account access by blocking or unblocking accounts."
+              description="Find member accounts and manage access when an account needs attention."
               href="/admin/users"
             />
 
             <AdminLinkCard
               title="Claims"
-              description="View ownership claims and monitor their current status and handover progress."
+              description="Track ownership requests and completed handovers."
               href="/admin/claims"
             />
           </div>
         </section>
 
-        {/* User Statistics */}
-        <section>
-          <h2 className="mb-4 text-lg font-bold text-gray-900">
-            User Statistics
-          </h2>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title="Total Users"
-              value={stats.totalUsers}
-              description="All registered accounts"
-            />
-
-            <StatCard
-              title="Active Users"
-              value={stats.activeUsers}
-              description="Accounts currently active"
-            />
-
-            <StatCard
-              title="Blocked Users"
-              value={stats.blockedUsers}
-              description="Accounts currently blocked"
-            />
-          </div>
-        </section>
-
-        {/* Report Statistics */}
-        <section>
-          <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Report Statistics
-          </h2>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              title="Total Reports"
-              value={stats.totalReports}
-              description="All submitted reports"
-            />
-
-            <StatCard
-              title="Active Reports"
-              value={stats.activeReports}
-              description="Currently available reports"
-            />
-
-            <StatCard
-              title="Lost Reports"
-              value={stats.lostReports}
-              description="Items reported as lost"
-            />
-
-            <StatCard
-              title="Found Reports"
-              value={stats.foundReports}
-              description="Items reported as found"
-            />
-          </div>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              title="Reports Under Review"
-              value={stats.underReviewReports}
-              description="Reports awaiting moderation"
-            />
-          </div>
-        </section>
-
-        {/* Claim Statistics */}
-        <section>
-          <h2 className="mb-4 text-lg font-bold text-gray-900">
-            Ownership Claim Statistics
-          </h2>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title="Pending Claims"
-              value={stats.pendingClaims}
-              description="Awaiting finder decision"
-            />
-
-            <StatCard
-              title="Accepted Claims"
-              value={stats.acceptedClaims}
-              description="Accepted, awaiting completion"
-            />
-
-            <StatCard
-              title="Completed Claims"
-              value={stats.completedClaims}
-              description="Successfully completed handovers"
-            />
-          </div>
-        </section>
-
-        {/* Recent Reports */}
-        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                Recent Reports
-              </h2>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Latest reports submitted on FindBack
-              </p>
-            </div>
-
-            <Link
-              href="/admin/reports"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              View All Reports →
-            </Link>
-          </div>
-
-          {recentReports.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              No reports found.
+        <section className="mt-9">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-slate-900">
+              Recent activity
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              The latest reports and ownership claims across FindBack.
             </p>
-          ) : (
-            <div className="space-y-4">
-              {recentReports.map((report) => (
-                <div
-                  key={report._id}
-                  className="flex flex-col justify-between gap-3 border-b border-gray-100 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[0.02]">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+                <div>
+                  <h3 className="font-semibold text-slate-900">Latest reports</h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Recently submitted by members
+                  </p>
+                </div>
+                <Link
+                  href="/admin/reports"
+                  className="text-sm font-semibold text-blue-700 hover:text-blue-800"
                 >
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {report.title}
-                    </p>
+                  View all
+                </Link>
+              </div>
 
-                    <p className="mt-1 text-sm text-gray-500">
-                      {report.type} · {report.category} · {report.city},{" "}
-                      {report.state}
-                    </p>
-
-                    <p className="mt-1 text-xs text-gray-400">
-                      By {report.userId?.name || "Unknown user"} ·{" "}
-                      {formatDate(report.createdAt)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={report.status} />
-
-                    <Link
-                      href={`/reports/${report._id}`}
-                      className="text-sm font-medium text-blue-600 hover:underline"
+              {recentReports.length === 0 ? (
+                <div className="px-5 py-10 text-center">
+                  <p className="font-medium text-slate-800">
+                    No reports to show yet
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    New community reports will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {recentReports.map((report) => (
+                    <div
+                      key={report._id}
+                      className="flex flex-col justify-between gap-3 px-5 py-4 sm:flex-row sm:items-center"
                     >
-                      View
-                    </Link>
-                  </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-slate-900">
+                          {report.title}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {report.type} · {report.category} · {report.city},{" "}
+                          {report.state}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-400">
+                          {report.userId?.name || "Unknown member"} ·{" "}
+                          {formatDate(report.createdAt)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <StatusBadge status={report.status} />
+                        <Link
+                          href={`/reports/${report._id}`}
+                          className="text-sm font-semibold text-blue-700 hover:text-blue-800"
+                        >
+                          View
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
+              )}
+            </section>
 
-        {/* Recent Claims */}
-        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                Recent Claims
-              </h2>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Latest ownership claim activity
-              </p>
-            </div>
-
-            <Link
-              href="/admin/claims"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              View All Claims →
-            </Link>
-          </div>
-
-          {recentClaims.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              No claims found.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {recentClaims.map((claim) => (
-                <div
-                  key={claim._id}
-                  className="flex flex-col justify-between gap-3 border-b border-gray-100 pb-4 last:border-0 last:pb-0 sm:flex-row sm:items-center"
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[0.02]">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+                <div>
+                  <h3 className="font-semibold text-slate-900">Latest claims</h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Ownership claim activity
+                  </p>
+                </div>
+                <Link
+                  href="/admin/claims"
+                  className="text-sm font-semibold text-blue-700 hover:text-blue-800"
                 >
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {claim.reportId?.title || "Report unavailable"}
-                    </p>
+                  View all
+                </Link>
+              </div>
 
-                    <p className="mt-1 text-sm text-gray-500">
-                      Claimant: {claim.claimantId?.name || "Unknown"}
-                    </p>
-
-                    <p className="text-sm text-gray-500">
-                      Finder: {claim.finderId?.name || "Unknown"}
-                    </p>
-
-                    <p className="mt-1 text-xs text-gray-400">
-                      {formatDate(claim.createdAt)}
-                    </p>
-                  </div>
-
-                  <StatusBadge status={claim.status} />
+              {recentClaims.length === 0 ? (
+                <div className="px-5 py-10 text-center">
+                  <p className="font-medium text-slate-800">
+                    No claims to show yet
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Submitted ownership claims will appear here.
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {recentClaims.map((claim) => (
+                    <div
+                      key={claim._id}
+                      className="flex flex-col justify-between gap-3 px-5 py-4 sm:flex-row sm:items-center"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-slate-900">
+                          {claim.reportId?.title || "Report unavailable"}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          {claim.claimantId?.name || "Unknown claimant"}{" "}
+                          <span aria-hidden="true">·</span>{" "}
+                          {formatDate(claim.createdAt)}
+                        </p>
+                      </div>
+                      <StatusBadge status={claim.status} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
         </section>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-gray-400">
-          FindBack Admin Panel
-        </p>
       </div>
     </main>
   );

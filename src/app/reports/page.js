@@ -1,8 +1,10 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+import PageHeading from "@/components/PageHeading";
 
 const categories = [
   "Electronics",
@@ -21,6 +23,8 @@ export default function ReportsPage() {
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
   const [city, setCity] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [appliedCity, setAppliedCity] = useState("");
   const [page, setPage] = useState(1);
 
   const [pagination, setPagination] = useState({
@@ -31,7 +35,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function fetchReports() {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -41,10 +45,10 @@ export default function ReportsPage() {
         limit: "9",
       });
 
-      if (search.trim()) params.set("search", search.trim());
+      if (appliedSearch) params.set("search", appliedSearch);
       if (type) params.set("type", type);
       if (category) params.set("category", category);
-      if (city.trim()) params.set("city", city.trim());
+      if (appliedCity) params.set("city", appliedCity);
 
       const response = await fetch(`/api/reports?${params.toString()}`);
       const data = await response.json();
@@ -60,16 +64,17 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [page, appliedSearch, type, category, appliedCity]);
 
   useEffect(() => {
     fetchReports();
-  }, [page, type, category]);
+  }, [fetchReports]);
 
   function handleSearch(event) {
     event.preventDefault();
     setPage(1);
-    fetchReports();
+    setAppliedSearch(search.trim());
+    setAppliedCity(city.trim());
   }
 
   function resetFilters() {
@@ -77,58 +82,44 @@ export default function ReportsPage() {
     setType("");
     setCategory("");
     setCity("");
+    setAppliedSearch("");
+    setAppliedCity("");
     setPage(1);
   }
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <nav className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-          <Link href="/" className="text-2xl font-bold text-slate-900">
-            FindBack
-          </Link>
-
-          <div className="flex items-center gap-5 text-sm font-medium">
-            <Link href="/dashboard" className="text-slate-600 hover:text-blue-600">
-              Dashboard
-            </Link>
-            <Link
-              href="/report/new"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-            >
-              + Report an Item
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <SiteNavbar />
 
       <section className="mx-auto max-w-7xl px-5 py-12">
-        <div className="mb-8">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-600">
-            Community Lost & Found
-          </p>
-          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-            Browse Reports
-          </h1>
-          <p className="mt-3 text-slate-600">
-            Search for lost belongings or help someone find their missing item.
-          </p>
-        </div>
+        <PageHeading
+          eyebrow="Community lost & found"
+          title="Browse reports"
+          description="Search for lost belongings or help someone find their missing item."
+        />
 
         <form
           onSubmit={handleSearch}
           className="mb-8 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
         >
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <label className="sr-only" htmlFor="report-search">
+              Search items
+            </label>
             <input
-              type="text"
+              id="report-search"
+              type="search"
               placeholder="Search items..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
             />
 
+            <label className="sr-only" htmlFor="report-type">
+              Report type
+            </label>
             <select
+              id="report-type"
               value={type}
               onChange={(e) => {
                 setType(e.target.value);
@@ -141,7 +132,11 @@ export default function ReportsPage() {
               <option value="found">Found Items</option>
             </select>
 
+            <label className="sr-only" htmlFor="report-category">
+              Category
+            </label>
             <select
+              id="report-category"
               value={category}
               onChange={(e) => {
                 setCategory(e.target.value);
@@ -157,7 +152,11 @@ export default function ReportsPage() {
               ))}
             </select>
 
+            <label className="sr-only" htmlFor="report-city">
+              City
+            </label>
             <input
+              id="report-city"
               type="text"
               placeholder="Filter by city..."
               value={city}

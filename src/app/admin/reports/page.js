@@ -4,6 +4,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+import PageHeading from "@/components/PageHeading";
 
 export default function AdminReportsPage() {
   const router = useRouter();
@@ -103,6 +105,17 @@ export default function AdminReportsPage() {
     }));
   }
 
+  function resetFilters() {
+    setSearchInput("");
+    setSearch("");
+    setStatus("all");
+    setType("all");
+    setPagination((previous) => ({
+      ...previous,
+      page: 1,
+    }));
+  }
+
   // Admin moderation action
   async function handleModeration(reportId, action) {
     const actionLabels = {
@@ -189,263 +202,263 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-slate-50">
+      <SiteNavbar />
+      <div className="mx-auto max-w-7xl px-5 py-8 sm:py-10">
+        <PageHeading
+          eyebrow="Admin workspace"
+          title="Report management"
+          description="Review item reports, check their details, and take moderation action."
+        />
 
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/admin"
-            className="text-sm font-medium text-blue-600 hover:underline"
-          >
-            ← Back to Admin Dashboard
-          </Link>
-
-          <div className="mt-5">
-            <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-              Report Management
-            </h1>
-            <p className="mt-2 text-sm text-gray-500">
-              Review, manage, and moderate user-submitted reports.
+        <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/[0.02]">
+          <div className="mb-4">
+            <h2 className="font-semibold text-slate-900">Find a report</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Search by item or location, then narrow the results by status or type.
             </p>
           </div>
-        </div>
 
-        {/* Search and Filters */}
-        <section className="mb-6 rounded-xl border border-gray-200 bg-white p-5">
           <form onSubmit={handleSearch}>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Search reports
+            <label
+              htmlFor="admin-report-search"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Search
             </label>
-
             <div className="flex flex-col gap-3 sm:flex-row">
               <input
-                type="text"
+                id="admin-report-search"
+                type="search"
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                placeholder="Search by title, city, or state..."
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                placeholder="Item title, city, or state"
+                className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
-
               <button
                 type="submit"
-                className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
-                Search
+                Search reports
               </button>
             </div>
           </form>
 
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Report status
+              <label
+                htmlFor="admin-report-status"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Status
               </label>
-
               <select
+                id="admin-report-status"
                 value={status}
-                onChange={(event) =>
-                  handleStatusChange(event.target.value)
-                }
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500"
+                onChange={(event) => handleStatusChange(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500"
               >
                 <option value="all">All statuses</option>
                 <option value="active">Active</option>
-                <option value="under_review">Under Review</option>
+                <option value="under_review">Under review</option>
                 <option value="resolved">Resolved</option>
                 <option value="removed">Removed</option>
               </select>
             </div>
-
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="admin-report-type"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
                 Report type
               </label>
-
               <select
+                id="admin-report-type"
                 value={type}
-                onChange={(event) =>
-                  handleTypeChange(event.target.value)
-                }
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-500"
+                onChange={(event) => handleTypeChange(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500"
               >
-                <option value="all">All types</option>
-                <option value="lost">Lost</option>
-                <option value="found">Found</option>
+                <option value="all">Lost and found</option>
+                <option value="lost">Lost items</option>
+                <option value="found">Found items</option>
               </select>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="mt-4 text-sm font-semibold text-blue-700 hover:text-blue-800"
+          >
+            Clear search and filters
+          </button>
         </section>
 
-        {/* Messages */}
         {error && (
-          <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
             {error}
           </div>
         )}
-
         {success && (
-          <div className="mb-5 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+          <div className="mb-5 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700" role="status">
             {success}
           </div>
         )}
 
-        {/* Report List */}
-        <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
-            <h2 className="font-semibold text-gray-900">
-              Reports
-            </h2>
-
-            <span className="text-sm text-gray-500">
-              {pagination.total} total reports
+        <section aria-labelledby="admin-reports-heading">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2
+                id="admin-reports-heading"
+                className="text-lg font-bold text-slate-900"
+              >
+                Report results
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Review each item and choose an action from its card.
+              </p>
+            </div>
+            <span className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">
+              {pagination.total.toLocaleString("en-IN")} total
             </span>
           </div>
 
           {loading ? (
-            <div className="p-10 text-center text-sm text-gray-500">
-              Loading reports...
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="h-64 animate-pulse rounded-2xl border border-slate-200 bg-white"
+                />
+              ))}
             </div>
           ) : reports.length === 0 ? (
-            <div className="p-10 text-center">
-              <p className="font-medium text-gray-700">
-                No reports found
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-14 text-center">
+              <h3 className="font-semibold text-slate-900">No reports found</h3>
+              <p className="mt-2 text-sm text-slate-500">
+                Try another search or clear the selected filters.
               </p>
-              <p className="mt-1 text-sm text-gray-500">
-                Try changing your search or filters.
-              </p>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="mt-5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Clear filters
+              </button>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
               {reports.map((report) => {
                 const isLocked = Boolean(report.acceptedClaimId);
                 const isBusy = actionLoading === report._id;
+                const typeClass =
+                  report.type === "lost"
+                    ? "bg-amber-50 text-amber-800"
+                    : "bg-emerald-50 text-emerald-800";
 
                 return (
                   <article
                     key={report._id}
-                    className="p-5"
+                    className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/[0.02] transition hover:border-slate-300 hover:shadow-md"
                   >
-                    <div className="flex flex-col justify-between gap-4 lg:flex-row">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-gray-900">
-                            {report.title}
-                          </h3>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${typeClass}`}>
+                        {report.type || "Report"} item
+                      </span>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${getStatusStyle(
+                          report.status
+                        )}`}
+                      >
+                        {formatStatus(report.status)}
+                      </span>
+                    </div>
 
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${getStatusStyle(
-                              report.status
-                            )}`}
-                          >
-                            {formatStatus(report.status)}
-                          </span>
-                        </div>
+                    <h3 className="mt-4 break-words text-lg font-bold text-slate-900">
+                      {report.title || "Untitled report"}
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {report.category || "Uncategorized"}
+                    </p>
 
-                        <p className="mt-2 text-sm text-gray-500">
-                          {report.type} · {report.category}
-                        </p>
-
-                        <p className="mt-1 text-sm text-gray-500">
-                          {report.city}, {report.state}
-                        </p>
-
-                        <p className="mt-2 text-sm text-gray-600">
-                          Submitted by:{" "}
-                          <span className="font-medium text-gray-800">
-                            {report.userId?.name || "Unknown"}
-                          </span>
-                        </p>
-
-                        <p className="mt-1 text-xs text-gray-400">
-                          Report ID: {report._id}
-                        </p>
-
-                        {isLocked && (
-                          <p className="mt-2 text-xs font-medium text-amber-700">
-                            This report has an accepted claim and is locked
-                            from moderation.
-                          </p>
-                        )}
+                    <dl className="mt-5 space-y-3 border-t border-slate-100 pt-4 text-sm">
+                      <div>
+                        <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                          Location
+                        </dt>
+                        <dd className="mt-1 font-medium text-slate-700">
+                          {[report.city, report.state].filter(Boolean).join(", ") || "Not provided"}
+                        </dd>
                       </div>
+                      <div>
+                        <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                          Reported by
+                        </dt>
+                        <dd className="mt-1 font-medium text-slate-700">
+                          {report.userId?.name || "Unknown member"}
+                        </dd>
+                      </div>
+                    </dl>
 
-                      {/* Actions */}
-                      <div className="flex flex-wrap items-start gap-2">
-                        {report.status === "active" && (
-                          <>
-                            <button
-                              onClick={() =>
-                                handleModeration(report._id, "review")
-                              }
-                              disabled={isBusy || isLocked}
-                              className="rounded-lg border border-yellow-300 px-3 py-2 text-xs font-medium text-yellow-700 hover:bg-yellow-50 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              Review
-                            </button>
+                    {isLocked && (
+                      <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-800">
+                        An accepted claim is attached. Moderation actions are disabled.
+                      </p>
+                    )}
 
-                            <button
-                              onClick={() =>
-                                handleModeration(report._id, "remove")
-                              }
-                              disabled={isBusy || isLocked}
-                              className="rounded-lg border border-red-300 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              Remove
-                            </button>
-                          </>
-                        )}
+                    <div className="mt-auto flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+                      <Link
+                        href={`/reports/${report._id}`}
+                        className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                      >
+                        View details
+                      </Link>
 
-                        {report.status === "under_review" && (
-                          <>
-                            <button
-                              onClick={() =>
-                                handleModeration(report._id, "restore")
-                              }
-                              disabled={isBusy || isLocked}
-                              className="rounded-lg border border-green-300 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              Restore
-                            </button>
-
-                            <button
-                              onClick={() =>
-                                handleModeration(report._id, "remove")
-                              }
-                              disabled={isBusy || isLocked}
-                              className="rounded-lg border border-red-300 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              Remove
-                            </button>
-                          </>
-                        )}
-
-                        {report.status === "removed" && (
+                      {report.status === "active" && (
+                        <>
                           <button
-                            onClick={() =>
-                              handleModeration(report._id, "restore")
-                            }
+                            type="button"
+                            onClick={() => handleModeration(report._id, "review")}
                             disabled={isBusy || isLocked}
-                            className="rounded-lg border border-green-300 px-3 py-2 text-xs font-medium text-green-700 hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="rounded-lg border border-amber-200 px-3 py-2 text-sm font-semibold text-amber-800 transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            Restore
+                            Mark for review
                           </button>
-                        )}
-
-                        {report.status === "active" && (
-                          <Link
-                            href={`/reports/${report._id}`}
-                            className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                          <button
+                            type="button"
+                            onClick={() => handleModeration(report._id, "remove")}
+                            disabled={isBusy || isLocked}
+                            className="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            View
-                          </Link>
-                        )}
+                            Remove
+                          </button>
+                        </>
+                      )}
 
-                        {isBusy && (
-                          <span className="self-center text-xs text-gray-500">
-                            Updating...
-                          </span>
-                        )}
-                      </div>
+                      {(report.status === "under_review" || report.status === "removed") && (
+                        <button
+                          type="button"
+                          onClick={() => handleModeration(report._id, "restore")}
+                          disabled={isBusy || isLocked}
+                          className="rounded-lg border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Restore report
+                        </button>
+                      )}
+                      {report.status === "under_review" && (
+                        <button
+                          type="button"
+                          onClick={() => handleModeration(report._id, "remove")}
+                          disabled={isBusy || isLocked}
+                          className="rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
+                      )}
+                      {isBusy && (
+                        <span className="self-center text-xs text-slate-500" aria-live="polite">
+                          Updating report...
+                        </span>
+                      )}
                     </div>
                   </article>
                 );
@@ -453,26 +466,26 @@ export default function AdminReportsPage() {
             </div>
           )}
 
-          {/* Pagination */}
           {!loading && pagination.totalPages > 1 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 px-5 py-4">
-              <p className="text-sm text-gray-500">
-                Page {pagination.page} of {pagination.totalPages}
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+              <p className="text-sm text-slate-600">
+                Page <span className="font-semibold text-slate-900">{pagination.page}</span> of{" "}
+                <span className="font-semibold text-slate-900">{pagination.totalPages}</span>
               </p>
-
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => changePage(pagination.page - 1)}
                   disabled={pagination.page <= 1}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Previous
                 </button>
-
                 <button
+                  type="button"
                   onClick={() => changePage(pagination.page + 1)}
                   disabled={pagination.page >= pagination.totalPages}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next
                 </button>

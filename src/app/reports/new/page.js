@@ -3,7 +3,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
+import PageHeading from "@/components/PageHeading";
 
 const categories = [
   "Electronics",
@@ -143,38 +144,14 @@ export default function NewReportPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <nav className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
-          <Link href="/" className="text-2xl font-bold text-slate-900">
-            FindBack
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-slate-600 hover:text-blue-600"
-          >
-            Dashboard
-          </Link>
-        </div>
-      </nav>
+      <SiteNavbar />
 
       <section className="mx-auto max-w-3xl px-5 py-10">
-        <Link
-          href="/reports"
-          className="text-sm font-medium text-blue-600 hover:underline"
-        >
-          ← Back to Reports
-        </Link>
-
-        <div className="mb-8 mt-6">
-          <h1 className="text-3xl font-bold text-slate-900">
-            Report an Item
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Share the details so the community can help reunite an item with
-            its owner.
-          </p>
-        </div>
+        <PageHeading
+          eyebrow="Community report"
+          title="Report an item"
+          description="Share the details so the community can help reunite an item with its owner."
+        />
 
         <form
           onSubmit={handleSubmit}

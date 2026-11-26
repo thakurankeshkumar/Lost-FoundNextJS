@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SiteNavbar from "@/components/SiteNavbar";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -47,7 +48,7 @@ export default function RegisterPage() {
                 return;
             }
 
-            router.push("/");
+            router.replace(data.user?.role === "admin" ? "/admin" : "/dashboard");
             router.refresh();
         } catch (err) {
             setError("Something went wrong. Please try again.");
@@ -57,16 +58,11 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5 py-12">
-            <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
-                <Link href="/" className="flex items-center gap-2">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl text-white">
-                        ⌖
-                    </span>
-                    <span className="text-xl font-bold text-slate-900">FindBack</span>
-                </Link>
-
-                <div className="mt-8">
+        <div className="min-h-screen bg-slate-50">
+            <SiteNavbar />
+            <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-5 py-12">
+              <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
+                <div>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">
                         Create an account
                     </h1>
@@ -182,13 +178,8 @@ export default function RegisterPage() {
                     </Link>
                 </p>
 
-                <Link
-                    href="/"
-                    className="mt-6 block text-center text-sm text-slate-400 hover:text-slate-600"
-                >
-                    ← Back to home
-                </Link>
-            </div>
-        </main>
+              </div>
+            </main>
+        </div>
     );
 }
