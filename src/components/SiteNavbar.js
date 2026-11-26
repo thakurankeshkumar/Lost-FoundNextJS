@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 
 const userLinks = [
@@ -238,9 +239,14 @@ export default function SiteNavbar({ landing = false }) {
           className="flex shrink-0 items-center gap-2.5"
           aria-label="FindBack home"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl text-white">
-            ⌖
-          </span>
+          <Image
+            src="/favicon.png"
+            alt=""
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-xl object-cover"
+            priority
+          />
           <span>
             <span className="block text-lg font-bold leading-tight text-slate-900">
               FindBack

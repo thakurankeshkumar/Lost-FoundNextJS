@@ -13,9 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "FindBack | Lost & Found Platform",
+  title: {
+    default: "FindBack | Lost & Found Platform",
+    template: "%s | FindBack",
+  },
   description:
     "Report lost and found items, discover potential matches, and reconnect belongings with their owners.",
+  icons: {
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
