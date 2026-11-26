@@ -238,8 +238,8 @@ export default function ReportDetailsPage() {
                                         key={image.publicId || image.url || index}
                                         onClick={() => setSelectedImage(index)}
                                         className={`h-20 w-20 shrink-0 overflow-hidden rounded-lg border-2 ${selectedImage === index
-                                                ? "border-blue-600"
-                                                : "border-slate-200"
+                                            ? "border-blue-600"
+                                            : "border-slate-200"
                                             }`}
                                     >
                                         <img
@@ -260,8 +260,8 @@ export default function ReportDetailsPage() {
                         <div className="flex flex-wrap items-center gap-3">
                             <span
                                 className={`rounded-full px-3 py-1 text-sm font-semibold ${report.type === "lost"
-                                        ? "bg-red-50 text-red-600"
-                                        : "bg-green-50 text-green-600"
+                                    ? "bg-red-50 text-red-600"
+                                    : "bg-green-50 text-green-600"
                                     }`}
                             >
                                 {report.type === "lost"
@@ -474,8 +474,8 @@ export default function ReportDetailsPage() {
 
                                                         <span
                                                             className={`rounded-full px-3 py-1 text-xs font-semibold ${match.report.type === "lost"
-                                                                    ? "bg-red-50 text-red-600"
-                                                                    : "bg-green-50 text-green-600"
+                                                                ? "bg-red-50 text-red-600"
+                                                                : "bg-green-50 text-green-600"
                                                                 }`}
                                                         >
                                                             {match.report.type === "lost"
