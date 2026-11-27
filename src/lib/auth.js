@@ -7,6 +7,18 @@ if (!secret || secret.length < 32) {
 
 const secretKey = new TextEncoder().encode(secret);
 
+export function getSessionCookieOptions(maxAge) {
+  const crossOriginFrontend = Boolean(process.env.CORS_ORIGINS?.trim());
+
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production" || crossOriginFrontend,
+    sameSite: crossOriginFrontend ? "none" : "lax",
+    path: "/",
+    maxAge,
+  };
+}
+
 export async function createSessionToken(userId) {
   return new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })

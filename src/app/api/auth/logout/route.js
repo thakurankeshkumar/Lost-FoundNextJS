@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getSessionCookieOptions } from "@/lib/auth";
 
 export async function POST() {
   try {
@@ -7,13 +8,7 @@ export async function POST() {
       message: "Logged out successfully",
     });
 
-    response.cookies.set("session", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-    });
+    response.cookies.set("session", "", getSessionCookieOptions(0));
 
     return response;
   } catch (err) {

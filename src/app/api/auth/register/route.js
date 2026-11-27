@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
-import { createSessionToken } from "@/lib/auth";
+import { createSessionToken, getSessionCookieOptions } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -64,13 +64,7 @@ export async function POST(request) {
       { status: 201 }
     );
 
-    response.cookies.set("session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    response.cookies.set("session", token, getSessionCookieOptions(60 * 60 * 24 * 7));
 
     return response;
   } catch (error) {
